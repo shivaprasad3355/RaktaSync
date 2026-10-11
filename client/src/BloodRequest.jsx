@@ -30,7 +30,7 @@ export default function BloodRequest() {
 
     try {
       const response = await fetch(
-        "/api/blood-requests",
+        "https://rakta-sync-nnxp.vercel.app/api/blood-requests",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -29,7 +29,7 @@ export default function StudentRegistration() {
 
     try {
       const response = await fetch(
-        "/api/students",
+       "https://rakta-sync-nnxp.vercel.app/api/students",
         {
           method: "POST",
           headers: {
