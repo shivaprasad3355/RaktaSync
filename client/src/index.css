@@ -1,0 +1,26 @@
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #f6eeee;
+  background: #090607;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button, input, select, textarea { font: inherit; }
+
+::selection {
+  color: white;
+  background: #b91c38;
+}
