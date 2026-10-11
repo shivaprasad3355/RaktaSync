@@ -240,12 +240,15 @@ def create_blood_request():
                 )
                 donors = cur.fetchall()
 
-        # Send one email per matching donor in the background.
-        def send_notifications():
-            for donor_name, donor_email in donors:
-                subject = f"RaktaSync blood request: {blood_group}"
 
-                body = f"""Hello {donor_name},
+        # Send emails before returning, so Vercel can log the result.
+        emails_sent = 0
+        emails_failed = 0
+
+        for donor_name, donor_email in donors:
+            subject = f"RaktaSync blood request: {blood_group}"
+
+            body = f"""Hello {donor_name},
 
 A blood request has been submitted through RaktaSync.
 
@@ -263,24 +266,26 @@ Confirm donation eligibility with a qualified medical professional.
 Thank you,
 RaktaSync
 """
-                try:
-                    send_brevo_email(donor_email, subject, body)
-                    app.logger.info("Email sent successfully to %s", donor_email)
-                except Exception:
-                    app.logger.exception(
-                        "Email failed for donor %s", donor_email
-                    )
 
-        if donors:
-            Thread(target=send_notifications, daemon=True).start()
+            try:
+                send_brevo_email(donor_email, subject, body)
+                emails_sent += 1
+                app.logger.info(
+                    "Email accepted by SMTP for donor %s", donor_email
+                )
+            except Exception:
+                emails_failed += 1
+                app.logger.exception(
+                    "Email failed for donor %s", donor_email
+                )
 
-        # Return immediately; email delivery continues in the background.
         return jsonify({
             "message": "Blood request created successfully",
             "request_id": request_id,
             "status": "open",
             "matching_donors": len(donors),
-            "emails_queued": len(donors),
+            "emails_sent": emails_sent,
+            "emails_failed": emails_failed,
         }), 201
 
     except Exception:
