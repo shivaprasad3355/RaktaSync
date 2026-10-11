@@ -17,25 +17,34 @@ CORS(app)
 
 
 
+
 def get_db_connection():
     database_url = os.getenv("DATABASE_URL")
 
-    # Use hosted Neon PostgreSQL on Vercel.
+    # Vercel must use the hosted Neon database.
     if database_url:
         return psycopg.connect(
             database_url,
-            connect_timeout=10
+            connect_timeout=10,
+            sslmode="require",
         )
 
-    # Use local PostgreSQL when running on your computer.
+    # Never silently try local PostgreSQL in production.
+    if os.getenv("VERCEL"):
+        raise RuntimeError(
+            "DATABASE_URL is missing from Vercel environment variables"
+        )
+
+    # Local development on your computer.
     return psycopg.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
+        host=os.getenv("DB_HOST", "localhost"),
+        port=os.getenv("DB_PORT", "5432"),
+        dbname=os.getenv("DB_NAME", "raktasync"),
+        user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD"),
         connect_timeout=10,
     )
+
 
 
 
