@@ -16,14 +16,27 @@ app = Flask(__name__)
 CORS(app)
 
 
+
 def get_db_connection():
+    database_url = os.getenv("DATABASE_URL")
+
+    # Use hosted Neon PostgreSQL on Vercel.
+    if database_url:
+        return psycopg.connect(
+            database_url,
+            connect_timeout=10
+        )
+
+    # Use local PostgreSQL when running on your computer.
     return psycopg.connect(
         host=os.getenv("DB_HOST"),
         port=os.getenv("DB_PORT"),
         dbname=os.getenv("DB_NAME"),
         user=os.getenv("DB_USER"),
         password=os.getenv("DB_PASSWORD"),
+        connect_timeout=10,
     )
+
 
 
 
